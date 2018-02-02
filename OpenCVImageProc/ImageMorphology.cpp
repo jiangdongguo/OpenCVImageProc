@@ -1,3 +1,8 @@
+/*
+ * 描述：形态学操作
+ * Created by Jiangdongguo on 2018.2.2
+ */
+
 #include"ImageMorphology.h"
 
 // 形态学腐蚀操作

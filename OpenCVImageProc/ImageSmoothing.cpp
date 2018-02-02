@@ -1,3 +1,8 @@
+/*
+* 描述：图像去噪(平滑)处理
+* Created by Jiangdongguo on 2018.2.2
+*/
+
 #include "ImageSmoothing.h"
 
 // 线性方框滤波
