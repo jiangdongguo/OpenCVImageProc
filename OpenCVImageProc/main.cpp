@@ -5,6 +5,8 @@
 #include<iostream>
 #include"ImageSmoothing.h"
 #include"ImageMorphology.h"
+
+void testCopyMakeBorder(int type);
 void resizeBrightnessAndContrast(int a, int b);
 void smoothOperator();
 
@@ -15,12 +17,14 @@ ImageSmoothing smooth;
 ImageMorphology morphology;
 
 int main() {
-
+	// BORDER_DEFAULT
+	// BORDER_CONSTANT
+	// BORDER_WRAP
+	testCopyMakeBorder(BORDER_REPLICATE);
 	/*-------------------------------------------------------------
 	*  点算子：调整亮度和对比度
 	*-------------------------------------------------------------*/
-	resizeBrightnessAndContrast(1,100);
-
+	//resizeBrightnessAndContrast(1,100);
 	/*-------------------------------------------------------------
 	 *  描述： 进行方框滤波，进行模糊处理
 	 *   ksize越大，模糊效果越明显
@@ -34,6 +38,25 @@ int main() {
 //	imshow("膨胀操作", morphology.dilateImage(srcImage, 15));
 	waitKey(0);
 	return 0;
+}
+
+void testCopyMakeBorder(int type) {
+	Mat src, dst;
+	src = imread("hashiqi.jpg");
+	if (!src.data) {
+		printf("加载源图像失败");
+	}
+	namedWindow("源图像");
+	imshow("源图像", src);
+	// 要处理边缘像素数量(测试用，可自定义)
+	int top = (int)(0.05*src.rows);
+	int bottom = (int)(0.05*src.rows);
+	int left = (int)(0.05*src.cols);
+	int right = (int)(0.05*src.cols);
+	// 边缘处理，固定填充颜色为蓝色(OpenCV默认为BGR)
+	copyMakeBorder(src, dst, top, bottom, left, right, type, Scalar(255,0,0));
+
+	imshow("BORDER_REPLICATE效果",dst);
 }
 
 void resizeBrightnessAndContrast(int a, int b) {
@@ -70,9 +93,9 @@ void smoothOperator() {
 	Mat srcImage = imread("yuwenwen.jpg");
 	namedWindow("原始图片");
 	imshow("原始图片", srcImage);
-	smooth.boxFilterImage(srcImage, dstBox, 3);
-	smooth.blurImage(srcImage, dstBlur, 3);
-	smooth.gaussianBlurImage(srcImage, dstGussian, 3);
+	smooth.boxFilterImage(srcImage, dstBox, 5);
+	smooth.blurImage(srcImage, dstBlur, 5);
+	smooth.gaussianBlurImage(srcImage, dstGussian, 5);
 	smooth.mediaBlurImage(srcImage, dstMedia,3);
 	smooth.bilateralFilterImage(srcImage, dstBilateral, 25, 25 * 2, 25 / 2);
 	imshow("方框滤波处理", dstBox);
