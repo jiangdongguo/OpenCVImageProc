@@ -9,6 +9,7 @@
 void testCopyMakeBorder(int type);
 void resizeBrightnessAndContrast(int a, int b);
 void smoothOperator();
+void addSaltNoise(Mat &image, int n);
 
 using namespace cv;
 using namespace std;
@@ -20,7 +21,7 @@ int main() {
 	// BORDER_DEFAULT
 	// BORDER_CONSTANT
 	// BORDER_WRAP
-	testCopyMakeBorder(BORDER_REPLICATE);
+//	testCopyMakeBorder(BORDER_REPLICATE);
 	/*-------------------------------------------------------------
 	*  点算子：调整亮度和对比度
 	*-------------------------------------------------------------*/
@@ -29,7 +30,7 @@ int main() {
 	 *  描述： 进行方框滤波，进行模糊处理
 	 *   ksize越大，模糊效果越明显
 	 *-------------------------------------------------------------*/
-	//smoothOperator();
+	smoothOperator();
 
 	/*-------------------------------------------------------------
 	*  描述： 形态学系列操作
@@ -90,17 +91,55 @@ void resizeBrightnessAndContrast(int a, int b) {
 
 void smoothOperator() {
 	Mat dstBox, dstBlur, dstGussian, dstMedia, dstBilateral;
+	Mat saltNoise,gussianNoise;
 	Mat srcImage = imread("yuwenwen.jpg");
 	namedWindow("原始图片");
 	imshow("原始图片", srcImage);
-	smooth.boxFilterImage(srcImage, dstBox, 5);
-	smooth.blurImage(srcImage, dstBlur, 5);
-	smooth.gaussianBlurImage(srcImage, dstGussian, 5);
-	smooth.mediaBlurImage(srcImage, dstMedia,3);
+//	smooth.boxFilterImage(srcImage, dstBox, 5);
+//	smooth.blurImage(srcImage, dstBlur, 5);
+//	smooth.gaussianBlurImage(srcImage, dstGussian, 5);
+//	imshow("方框滤波处理", dstBox);
+//	imshow("均值滤波处理", dstBlur);
+//	imshow("高斯滤波处理", dstGussian);
 	smooth.bilateralFilterImage(srcImage, dstBilateral, 25, 25 * 2, 25 / 2);
-	imshow("方框滤波处理", dstBox);
-	imshow("均值滤波处理", dstBlur);
-	imshow("高斯滤波处理", dstGussian);
-	imshow("中值滤波处理", dstMedia);
 	imshow("双边滤波处理", dstBilateral);
+/* 中值滤波处理椒盐噪声
+	srcImage.copyTo(saltNoise);
+	addSaltNoise(saltNoise, 250);
+	smooth.mediaBlurImage(saltNoise, dstMedia, 3);
+	imshow("添加椒盐噪声", saltNoise);
+	imshow("高斯滤波处理", dstMedia);
+*/
+}
+
+// 添加椒盐噪声，n为噪声点数量
+void addSaltNoise(Mat &image, int n){
+	// 添加白点
+	for (int k = 0; k<n; k++)
+	{
+		int i = rand() % image.cols;
+		int j = rand() % image.rows;
+		if (image.channels() == 1){
+			image.at<uchar>(j, i) = 255;
+		}
+		else if (image.channels() == 3){
+			image.at<Vec3b>(j, i)[0] = 255;
+			image.at<Vec3b>(j, i)[1] = 255;
+			image.at<Vec3b>(j, i)[2] = 255;
+		}
+	}
+	// 添加黑点
+	for (int k = 0; k<n; k++)
+	{
+		int i = rand() % image.cols;
+		int j = rand() % image.rows;
+		if (image.channels() == 1) {
+			image.at<uchar>(j, i) = 0;
+		}
+		else if (image.channels() == 3) {
+			image.at<Vec3b>(j, i)[0] = 0;
+			image.at<Vec3b>(j, i)[1] = 0;
+			image.at<Vec3b>(j, i)[2] = 0;
+		}
+	}
 }
